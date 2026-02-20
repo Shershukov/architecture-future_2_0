@@ -1,0 +1,58 @@
+@startuml
+!include samples/C4_Container.puml
+
+title Целевая архитектура "Будущее 2.0" (Через 1 год)
+
+Person(analyst, "Бизнес-аналитик", "Создает отчёты в портале самообслуживания")
+Person(manager, "Руководитель направления", "Потребляет готовые дашборды")
+Person(engineer, "Инженер данных", "Поддерживает пайплайны и витрины")
+
+Boundary(cloud, "Облачная инфраструктура", "Yandex Cloud") {
+
+    Container(portal, "Портал самообслуживия", "Web App + BI Engine", "Конструктор отчётов, RBAC, Визуализация")
+
+    Container(gateway, "API Gateway", "API Gateway", "Маршрутизация, Auth, Rate Limiting")
+    Container(iam, "IAM & Security", "Identity Service", "Управление доступом, Аудит, Шифрование")
+
+    ContainerDb(lake, "Data Lake", "MinIO", "Сырые данные из всех источников")
+    ContainerDb(dwh, "Cloud DWH", "Clickhouse", "Очищенные данные, Основная бизнес-логика")
+
+    ContainerDb(mart_fin, "Data Mart: Финтех", "Clickhouse", "Данные для фин. отчётности")
+    ContainerDb(mart_ops, "Data Mart: Операционка", "Clickhouse", "Данные для клиник и склада")
+    ContainerDb(mart_ai, "Data Mart: Метрики AI", "Clickhouse", "Метрики эффективности ИИ")
+
+    ContainerQueue(event_bus, "Event Bus", "Kafka", "Асинхронная передача событий")
+
+    Boundary(secure_zone, "Защищенная зона", "Повышенный уровень защиты") {
+        ContainerDb(vault, "Безопасное хранилище", "Защифровання ДБ", "Медкарты, истории болезней")
+    }
+}
+
+Boundary(legacy, "Легаси и внешние системы", "On-premise / External") {
+    System_Ext(sql_legacy, "MS SQL Server 2008", "Legacy DWH", "Текущее хранилище данных")
+    System_Ext(mis, "Медицинская система", "Медицинская информационная система", "Первичный ввод медицинских данных")
+    System_Ext(bank_system, "Банковская системы", "Banking System", "Транзакции, счета")
+}
+
+Rel(analyst, portal, "1. Конструирует отчёты", "HTTPS")
+Rel(manager, portal, "1. Просматривает дашборды", "HTTPS")
+Rel(engineer, dwh, "2. Управляет пайплайнами", "SSH/CLI")
+
+Rel(portal, gateway, "3. Запрос данных", "HTTPS")
+Rel(gateway, iam, "4. Проверка прав доступа", "HTTPS")
+Rel(gateway, mart_fin, "5. Запрос витрины", "SQL")
+Rel(gateway, mart_ops, "5. Запрос витрины", "SQL")
+Rel(gateway, mart_ai, "5. Запрос витрины", "SQL")
+
+Rel(mart_fin, dwh, "6. Общая модель данных", "ETL")
+Rel(mart_ops, dwh, "6. Общая модель данных", "ETL")
+Rel(mart_ai, dwh, "6. Общая модель данных", "ETL")
+Rel(lake, dwh, "6. Загрузка очищенных данных", "ELT")
+Rel(event_bus, lake, "7. Потребление событий", "Kafka Consumer")
+
+Rel(sql_legacy, lake, "8. Миграция данных", "Export")
+Rel(bank_system, event_bus, "9. Транзакции", "Kafka Producer")
+Rel(mis, vault, "10. Поток мед. данных", "TLS")
+Rel(mis, lake, "11. Метаданные (без ПДн)", "Export")
+
+@enduml
