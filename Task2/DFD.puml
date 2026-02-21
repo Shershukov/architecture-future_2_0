@@ -1,0 +1,46 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+
+
+package "Поставщик электроники" {
+    [ElPartner Domain] as ElPartner
+}
+
+package "Поставщик Фармацевтики" {
+    [FarmPartner Domain] as FarmPartner
+}
+
+package "Клиники" {
+    [Clinical Domain] as Clinical
+}
+
+package "Финтех" {
+    [Financial Domain] as Financial
+}
+
+package "ИИ-сервисы" {
+    [AI Domain] as AI
+}
+
+package "Cloud DWH" {
+    database "Mart_Clinical" as MartC
+    database "Mart_Finance" as MartF
+    database "Mart_AI" as MartA
+    database "Mart_ElPartner" as ElPartnerMart
+    database "Mart_FarmPartner" as FarmPartnerMart
+}
+
+Clinical --> Financial : Счёт на оплату
+Financial --> AI : Анонимизированные транзакции
+AI --> Clinical : Результат прогнозирования
+ElPartner --> Clinical : Поставки оборудования
+FarmPartner --> Clinical : Поставки медикаментов
+
+Clinical --> MartC : ETL
+Financial --> MartF : ETL
+AI --> MartA : ETL
+ElPartner --> ElPartnerMart : ETL
+FarmPartner --> FarmPartnerMart : ETL
+
+@enduml
