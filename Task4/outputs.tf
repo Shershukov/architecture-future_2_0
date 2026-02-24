@@ -13,11 +13,6 @@ output "k8s_cluster_id" {
   value       = yandex_kubernetes_cluster.main.id
 }
 
-output "data_lake_bucket" {
-  description = "Имя бакета Data Lake"
-  value       = yandex_storage_bucket.data_lake.bucket
-}
-
 output "vault_cluster_id" {
   description = "ID PostgreSQL кластера Vault"
   value       = yandex_mdb_postgresql_cluster.vault.id

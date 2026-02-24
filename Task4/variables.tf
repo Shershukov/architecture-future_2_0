@@ -41,10 +41,9 @@ variable "private_cidrs" {
 }
 
 variable "yc_oauth_token" {
-  description = "IAM-токен для аутентификации (только для тестов!)"
+  description = "IAM-токен для аутентификации"
   type        = string
   sensitive   = true
-  default     = ""
 }
 
 variable "project_name" {
@@ -78,7 +77,7 @@ variable "private_cidr" {
 variable "k8s_version" {
   description = "Версия Kubernetes"
   type        = string
-  default     = "1.27"
+  default     = "1.33"
 }
 
 variable "k8s_node_count" {
@@ -108,7 +107,7 @@ variable "vault_preset" {
 variable "vault_disk_size" {
   description = "Размер диска Vault (GB)"
   type        = number
-  default     = 50
+  default     = 10
 }
 
 variable "vault_db_username" {
@@ -118,7 +117,7 @@ variable "vault_db_username" {
 }
 
 variable "vault_db_password" {
-  description = "Пароль БД Vault (в prod использовать Lockbox!)"
+  description = "Пароль БД Vault"
   type        = string
   sensitive   = true
 }

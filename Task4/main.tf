@@ -31,7 +31,7 @@ provider "yandex" {
 }
 
 resource "yandex_vpc_network" "main" {
-  name = "${var.project_name}-${var.environment}-network"
+  name = "${var.project_name}-${var.environment}-network1"
 }
 
 resource "yandex_vpc_subnet" "public" {
@@ -90,7 +90,7 @@ resource "yandex_iam_service_account" "k8s" {
 resource "yandex_resourcemanager_folder_iam_member" "k8s_editor" {
   folder_id = var.yc_folder_id
   role      = "editor"
-  member    = "serviceAccount:aje36ogaht49oljr1i02"
+  member    = "serviceAccount:${yandex_iam_service_account.k8s.id}"
 }
 
 resource "yandex_kubernetes_cluster" "main" {
@@ -138,7 +138,7 @@ resource "yandex_kubernetes_node_group" "main" {
 
     boot_disk {
       type = "network-ssd"
-      size = 50
+      size = 30
     }
 
     network_interface {
@@ -157,7 +157,9 @@ resource "yandex_kubernetes_node_group" "main" {
   }
 
   allocation_policy {
-    location { zone = var.yc_default_zone }
+    location { zone = "ru-central1-a" }
+    location { zone = "ru-central1-b" }
+    location { zone = "ru-central1-d" }
   }
 
   depends_on = [yandex_kubernetes_cluster.main]
@@ -194,35 +196,6 @@ data "yandex_compute_image" "ubuntu" {
   family = "ubuntu-2204-lts"
 }
 
-resource "yandex_storage_bucket" "data_lake" {
-  bucket   = "${var.project_name}-data-lake-${var.environment}"
-  max_size = var.data_lake_max_size
-  access_key =""
-  secret_key =""
-
-  anonymous_access_flags {
-    read        = false
-    list        = false
-    config_read = false
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = yandex_kms_symmetric_key.main.id
-      }
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [
-      bucket,
-      max_size,
-    ]
-  }
-}
-
 resource "yandex_mdb_postgresql_cluster" "vault" {
   name        = "${var.project_name}-vault"
   environment = "PRODUCTION"
@@ -232,7 +205,7 @@ resource "yandex_mdb_postgresql_cluster" "vault" {
     version = var.postgres_version
     resources {
       resource_preset_id = var.vault_preset
-      disk_size          = 10
+      disk_size          = 16
       disk_type_id       = "network-ssd"
     }
   }

@@ -1,6 +1,3 @@
-yc_cloud_id     = "b1ginatngssbal9urai5"
-yc_folder_id    = "b1gis7ch97f985l68hbk"
-yc_oauth_token = "y0__xDkl8HhARjB3RMgn4DJwhYwg9uasQgUWuSNDPd0NKOAbOa4Gln9j__N_A"
 yc_default_zone = "ru-central1-a"
 subnet_zones = ["ru-central1-a", "ru-central1-b", "ru-central1-d"]
 
@@ -23,7 +20,7 @@ private_cidrs = {
   "ru-central1-d" = "10.0.13.0/24"
 }
 
-k8s_version            = "1.27"
+k8s_version            = "1.33"
 k8s_node_count         = 3
 bastion_ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2E... user@host"
 
