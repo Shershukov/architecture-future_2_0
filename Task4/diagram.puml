@@ -1,0 +1,49 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+
+title Диаграмма развертывания: Terraform и ручное разворачивание
+
+legend right
+  |= Цвет |= Значение |
+  |<#438DD5>Синий| Terraform - Автоматизировано |
+  |<#8B0000>Красный| Manual - Ручное |
+  |<#999999>Серый| External - Внешние |
+endlegend
+
+package "Cloud Infrastructure" {
+
+    package "Terraform (Auto)" {
+        component "Network\n(VPC, Subnets)" as network #438DD5
+        component "Compute\n(K8s, VM)" as compute #438DD5
+        component "Storage\n(S3, DWH, Vault)" as storage #438DD5
+        component "Security\n(IAM, SG)" as security #438DD5
+    }
+
+    package "Manual" {
+        component "Certificates\n(SSL/TLS)" as cert #8B0000
+        component "Secrets\n(DB Users, Keys)" as secrets #8B0000
+        component "Compliance\n(Approvals)" as compliance #8B0000
+    }
+}
+
+package "External Systems" {
+    component "Legacy\n(SQL, PowerBuilder)" as legacy #999999
+    component "Bank\n(Bank System)" as bank #999999
+    component "MedSys\n(Медицинская система)" as mis #999999
+}
+
+network --> compute
+compute --> storage
+security --> compute
+security --> storage
+
+cert --> compute
+secrets --> storage
+compliance --> storage
+
+legacy --> storage
+bank --> storage
+mis --> storage
+
+@enduml
